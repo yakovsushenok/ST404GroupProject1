@@ -1,0 +1,178 @@
+---
+title: "assignment1"
+author: "yakov"
+date: "27/01/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+```
+
+
+# Loading the data
+
+```{r }
+load("C:\\Users\\Yakov\\Downloads\\USACrime.Rda")
+df=USACrime
+```
+
+# EDA
+
+We first check the dimensions of the dataset:
+
+```{r}
+dim(df)
+```
+As we see, the dataset is consisted of 1902 rows and 24 columns.
+
+We will now check the summaries of all of the variables in the dataset by calling the `summary()` funciton:
+
+```{r}
+summary(df)
+```
+
+The `State` variable is not equally distributed among the states, as California has nealy double the observations than the 4th state by observations. `region` has very low observations in `pacific`. `pctUrban` has values only 100? We should check this out more closely.  `medIncome` is fairly symmetric with a minor skew. `pctWdiv`, `pctLowEdu`, `pctNoyHSgrad`, `pctCollGrad`, `pctUnemploy`, `pctEmploy`, `pctKids2Par` are okay. `pctKidsBornNeverMarr` probably have some outliers - should check. `pctHousOccup`, `pctHouseOwnerOccup` are okay. `pctVacanBoarded`, `pctVacan6up`, `ownHousMed`, `ownHousQrange`, `rentMed`, `rentQrange`, `popDensity`, `pctForeignBorn`, `violentPerPop`, `nonViolPerPop` are all right skewed and probably have some outliers - should check.
+
+We can see that the variables `State` and `region` are factors. We can also see that only 2 columns out of the 24 have missing values. Those are `medIncome` and `pctEmploy`. We will have to investigate these columns more closely later on as we pre-process the data for modelling.
+
+We check whether the columns have rows which share missing values:
+
+```{r}
+sum(is.na(df))
+```
+The columns don't share any rows with missing values.
+
+Let's check how many distinct values and what class each column is:
+
+```{r eval=FALSE, include=FALSE}
+df %>% summarise_all(n_distinct)
+```
+We can see that `pctUrban` has only 263 distinct values and `popDensity` has 359 distinct values. I think these are normal values and we should not consider these columns as factors.
+
+Let's check the classes of the columns in the dataset:
+
+```{r}
+lapply(df,class)
+```
+
+Every column is of type numeric or integer. That's good, since now we know that we only have 2 factor columns.
+
+## Univariate properties
+
+We first check the 2 target variables `violentPerPop` and `nonViolPerPop`:
+
+```{r include=FALSE}
+library(grid)
+multiplot <- function(..., plotlist=NULL, cols) {
+    
+
+    # Make a list from the ... arguments and plotlist
+    plots <- c(list(...), plotlist)
+
+    numPlots = length(plots)
+
+    # Make the panel
+    plotCols = cols                          # Number of columns of plots
+    plotRows = ceiling(numPlots/plotCols) # Number of rows needed, calculated from # of cols
+
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(plotRows, plotCols)))
+    vplayout <- function(x, y)
+        viewport(layout.pos.row = x, layout.pos.col = y)
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+        curRow = ceiling(i/plotCols)
+        curCol = (i-1) %% plotCols + 1
+        print(plots[[i]], vp = vplayout(curRow, curCol ))
+    }
+
+}
+```
+
+
+
+```{r}
+attach(df)
+
+hist(violentPerPop,col="blue")
+
+```
+Heavy right skew as mentioned before. Bulk of values are in the range 0-500.
+
+
+
+```{r}
+hist(nonViolPerPop,col="blue")
+```
+Right skewed with bulk of observations in the 2500-7500 range.
+
+## Bivariate properties
+
+```{r}
+plot(violentPerPop~State,main="violentPerPop versus State",col="blue")
+
+```
+
+This is kind of inconclusive. When I have the time, I'll subset the dataframe into 2 parts, where we can see the "bad" states, and "good" states. A "bad" state would where violentPerPop is bigger than the mean, and "good" would be otherwise. I could run the `identify` function also to just click and identify the bad and good states.
+
+
+```{r eval=FALSE, include=FALSE}
+df1=df
+halfstatevector=
+dfStates=df1[]
+```
+
+
+
+```{r}
+plot(nonViolPerPop~State,main="nonViolPerPop versus State",col="blue")
+```
+```{r}
+boxplot(violentPerPop~region,main="violentPerPop versus region")
+```
+South and West have most cities with higher crime rate, although Northeast has the highest crime rates. This does not imply that South and West have higher crime rates though, since the region South and West are bigger than midWest and Pacific.
+
+```{r}
+boxplot(nonViolPerPop~region,main="nonViolPerPop versus region")
+```
+
+```{r}
+
+violUrbanPlot=df %>% ggplot(aes(x=pctUrban,y=violentPerPop))+geom_point()+geom_smooth()
+violUrbanPlot
+
+nonViolUrbanPlot=df %>% ggplot(aes(x=pctUrban,y=nonViolPerPop))+geom_point()+geom_smooth()
+
+multiplot(violUrbanPlot,nonViolUrbanPlot,cols=2)
+
+
+```
+
+Not much I can conclude from these plots.
+```{r}
+plot1=df %>% ggplot(aes(x=medIncome,y=violentPerPop))+geom_point()+geom_smooth()
+
+plot2=df %>% ggplot(aes(x=medIncome,y=nonViolPerPop))+geom_point()+geom_smooth()
+
+multiplot(plot1,plot2,cols=2)
+```
+
+
+We now plot a correlation matrix for all non-factor variables. 
+
+```{r}
+source("http://www.sthda.com/upload/rquery_cormat.r")
+mydata <- df[, c(3:ncol(df))]
+require("corrplot")
+rquery.cormat(mydata)
+
+```
+
+
+
+
