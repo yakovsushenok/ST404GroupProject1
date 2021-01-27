@@ -1,0 +1,22 @@
+---
+title: "ST404-Project-1"
+author: "group17"
+date: "27/01/2021"
+output: html_document
+---
+
+This will be the file we all edit for you final version.
+  1)Which variables show a strong relationship with the outcome variables?
+  ◦ Can the relationship be characterized as a linear?
+  ◦ Does the relationship appear to be homoscedastic?
+  ◦ What transformations, if any, might be applied, to resolve any issues?
+  
+ 
+  ◦ Are there any other approaches that could be taken to tackle these issues?
+  2) Which variables, if any, have a highly skewed distribution? What transformations might be
+  applied to reduce skewness and stabilize the spread of the observations?
+  3) Do any of the variables have outlying values? How should outliers be treated?
+  4) Which variables are highly correlated with each other? Are there variables that represent
+  different ways of measuring the same thing?
+  5) Given all of the above, what recommendations would you suggest for preparing these data
+  in order to fit a linear model?
