@@ -1,0 +1,277 @@
+---
+title: "Untitled"
+author: "u1708076"
+date: "1/28/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+```
+
+
+```{r }
+load("/Users/yangqianci/Downloads/USACrime.Rda")
+df= USACrime
+```
+
+```{r}
+summary(df)
+```
+
+Question: Do any of the variables have outlying values? How should outliers be treated?
+
+I plot the boxplots of all univarites.
+
+From the boxplots, it is clear that varirables "medIncome", "pctWdiv", "pctLowEdu", "pctNotHSgrad", "pctCollGrad", "pctUnemploy", "pctEmploy", "pctKids2Par", "pctKidsBornNevrMarr", "pctHousOccup", "pctHousOwnerOccup", "pctVacantBoarded", "pctVacant6up", "ownHousMed ", "ownHousQrange", "rentMed", "rentQrange", "popDensity", "pctForeignBorn", "violentPerPop" and "nonViolPerPop" have outlying values.
+
+We will check for a data entry error firstly. Examine the physical context.
+We might need to pay attention to these outlying values when we fit a model: exclude the point from the analysis but try including it later to see if the model is changed.
+
+
+
+```{r}
+Univarite <- par(mfrow=c(2,3),  mar =c(4,4,4,4))
+ggplot(df, aes( y=pctUrban)) + 
+geom_boxplot(aes(fill = "red"))  
+
+ ggplot(df, aes( y=medIncome)) + 
+geom_boxplot(aes(fill = "red")) 
+
+ggplot(df, aes( y=pctWdiv)) + 
+geom_boxplot(aes(fill = "red"))
+
+ggplot(df, aes( y=pctLowEdu)) + 
+geom_boxplot(aes(fill = "red"))
+
+ggplot(df, aes( y=pctNotHSgrad)) + 
+geom_boxplot(aes(fill = "red"))
+
+ggplot(df, aes( y=pctCollGrad)) + 
+geom_boxplot(aes(fill = "red"))
+
+
+
+
+#boxplot(pctKidsBornNevrMarr ~ medIncome, col=c("red", "light blue"))
+#mtext(text = "medIncome", side =1, line =2, cex=0.7)
+#mtext(text = "pctKidsBornNevrMarr", side =2, line =2, cex =  0.7)
+par(Univarite)
+```
+
+
+
+
+```{r}
+
+Univarite2 <- par(mfrow=c(3,3),  mar =c(3,3,3,3))
+
+ggplot(df, aes( y=pctUnemploy)) + 
+geom_boxplot(aes(fill = "red"))
+
+ggplot(df, aes( y=pctEmploy)) + 
+geom_boxplot(aes(fill = "red"))
+
+ggplot(df, aes( y=pctKids2Par)) + 
+geom_boxplot(aes(fill = "red"))
+
+ggplot(df, aes( y=pctKidsBornNevrMarr)) + 
+geom_boxplot(aes(fill = "red"))
+
+ggplot(df, aes( y=pctHousOccup)) + 
+geom_boxplot(aes(fill = "red"))
+
+ggplot(df, aes( y=pctHousOwnerOccup)) + 
+geom_boxplot(aes(fill = "red"))
+
+
+ggplot(df, aes( y=pctVacantBoarded)) + 
+geom_boxplot(aes(fill = "red"))
+
+
+ggplot(df, aes( y=pctVacant6up)) + 
+geom_boxplot(aes(fill = "red"))
+
+
+ggplot(df, aes( y=ownHousMed)) + 
+geom_boxplot(aes(fill = "red"))
+
+```
+
+
+```{r}
+Univarite3 <- par(mfrow=c(2,4))
+
+ggplot(df, aes( y=ownHousQrange)) + 
+geom_boxplot(aes(fill = "red"))
+
+
+ggplot(df, aes( y=rentMed)) + 
+geom_boxplot(aes(fill = "red"))
+
+
+ggplot(df, aes( y=rentQrange)) + 
+geom_boxplot(aes(fill = "red"))
+
+
+ggplot(df, aes( y=popDensity)) + 
+geom_boxplot(aes(fill = "red"))
+
+
+ggplot(df, aes( y=pctForeignBorn)) + 
+geom_boxplot(aes(fill = "red"))
+
+
+ggplot(df, aes( y=pctHousOwnerOccup)) + 
+geom_boxplot(aes(fill = "red"))
+
+
+ggplot(df, aes( y=violentPerPop)) + 
+geom_boxplot(aes(fill = "red"))
+
+
+ggplot(df, aes( y=nonViolPerPop)) + 
+geom_boxplot(aes(fill = "red"))
+```
+
+Merely focus on the univariate outlying values is not sufficient. I will plot the bivariate situation.
+
+bivariate
+
+```{r fig.width=7}
+ggplot(df, aes(x = State, y = violentPerPop ))+ 
+geom_boxplot(aes(fill = State))
+
+
+```
+
+```{r}
+
+
+ggplot(df, aes(x = region, y = violentPerPop ))+ 
+geom_boxplot(aes(fill = region))
+
+```
+
+```{r}
+a <-plot(df$violentPerPop ~ df$pctUrban,main="violentPerPop versus pctUrban",col="blue")
+abline(a, col = "red")
+```
+
+```{r}
+x <- plot(df$violentPerPop~ df$medIncome,main="violentPerPop versus medIncome",col="blue")
+abline(x, col = "red")
+
+```
+
+```{r}
+x <- plot(df$violentPerPop~ df$pctWdiv,main="violentPerPop versus pctWdiv",col="blue")
+abline(x, col = "red")
+
+```
+
+```{r}
+x <- plot(df$violentPerPop~ df$pctLowEdu,main="violentPerPop versus pctLowEdu",col="blue")
+abline(x, col = "red")
+
+```
+
+```{r}
+x <- plot(df$violentPerPop~ df$pctNotHSgrad ,main="violentPerPop versus pctNotHSgrad",col="blue")
+abline(x, col = "red")
+
+```
+
+```{r}
+x <- plot(df$violentPerPop~ df$pctCollGrad ,main="violentPerPop versus pctCollGrad",col="blue")
+abline(x, col = "red")
+
+```
+
+
+```{r}
+x <- plot(df$violentPerPop~  df$pctUnemploy ,main="violentPerPop versus  pctUnemploy",col="blue")
+abline(x, col = "red")
+
+```
+
+```{r}
+x <- plot(df$violentPerPop~ df$pctEmploy ,main="violentPerPop versus pctEmploy",col="blue")
+abline(x, col = "red")
+
+```
+
+```{r}
+x <- plot(df$violentPerPop~ df$pctKids2Par ,main="violentPerPop versus pctKids2Par",col="blue")
+abline(x, col = "red")
+
+```
+
+```{r}
+x <- plot(df$violentPerPop~ df$pctKidsBornNevrMarr,main="violentPerPop versus pctKidsBornNevrMarr",col="blue")
+abline(x, col = "red")
+
+```
+
+```{r}
+x <- plot(df$violentPerPop~ df$pctHousOccup,main="violentPerPop versus pctHousOccup",col="blue")
+abline(x, col = "red")
+
+```
+```{r}
+x <- plot(df$violentPerPop~ df$pctHousOwnerOccup ,main="violentPerPop versus pctHousOwnerOccup",col="blue")
+abline(x, col = "red")
+
+```
+
+```{r}
+x <- plot(df$violentPerPop~ df$pctVacantBoarded,main="violentPerPop versus pctVacantBoarded",col="blue")
+abline(x, col = "red")
+
+```
+
+```{r}
+x <- plot(df$violentPerPop~ df$pctVacant6up,main="violentPerPop versus  pctVacant6up",col="blue")
+abline(x, col = "red")
+
+```
+
+```{r}
+x <- plot(df$violentPerPop~  df$ownHousMed,main="violentPerPop versus   ownHousMed",col="blue")
+abline(x, col = "red")
+
+```
+
+```{r}
+x <- plot(df$violentPerPop~ df$ownHousQrange,main="violentPerPop versus ownHousQrange",col="blue")
+abline(x, col = "red")
+
+```
+
+```{r}
+x <- plot(df$violentPerPop~ df$rentMed,main="violentPerPop versus  rentMed",col="blue")
+abline(x, col = "red")
+
+```
+
+
+```{r}
+x <- plot(df$violentPerPop~  df$rentQrange,main="violentPerPop versus  rentQrange",col="blue")
+abline(x, col = "red")
+
+```
+
+```{r}
+x <- plot(df$violentPerPop~  df$popDensity ,main="violentPerPop versus  popDensity ",col="blue")
+abline(x, col = "red")
+
+```
+
+
+```{r}
+x <- plot(df$violentPerPop ~ df$pctForeignBorn ,main="violentPerPop versus pctForeignBorn ",col="blue")
+abline(x, col = "red")
+
+```
