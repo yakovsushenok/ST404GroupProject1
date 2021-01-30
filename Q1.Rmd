@@ -1,0 +1,160 @@
+---
+title: "q1"
+author: "yakov"
+date: "29/01/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Which variables show a strong relationship with the outcome variables?
+
+
+To see which variables are significantly associated with the outcome variables, we will conduct hypothesis tests on each of the variables. The hypotheses are the following: 
+
+
+$$H_0: \text{corr}(x_i,y_j)=0, H_1: \text{corr}(x_i,y_j)\neq 0 , i=1,...,20, j=1,2$$
+
+We explain $i$ ranging in the interval $1$ to $20$ due to there being $24$ variables, out of which $2$ are factor variables and $2$ are target variables.
+
+In the following chunk of code we are going to conduct tests with the variable `violentPerPop`:
+
+```{r}
+# Subsetting the dataframe so that it excludes State, region and violentPerPop
+dfcor1 <- subset(df, select = -c(State, region, violentPerPop,nonViolPerPop))
+
+for(i in colnames(dfcor1)){
+  print(i)
+  test=cor.test(dfcor1[[i]],df$violentPerPop)
+ cat(sprintf("t-statistic is: %s, p-value is: %s, and correlation coefficient estimate is %s",test$statistic, test$p.value,test$estimate))
+  writeLines("\n")
+}
+
+```
+
+As we can see, the only variable which doesn't have correlation which is significantly different than $0$ is `pctVacant6up`. We also observe very strong correlation with the variables `pctKids2Par` as well as `pctKidsBornNevrMarr`.
+
+We will now examine the relationship between `nonViolPerPop` and the other variables:
+
+```{r}
+for(i in colnames(dfcor1)){
+  print(i)
+  test=cor.test(dfcor1[[i]],df$nonViolPerPop)
+  cat(sprintf("t-statistic is: %s, p-value is: %s, and correlation coefficient estimate is %s",test$statistic, test$p.value,test$estimate))
+  writeLines("\n")
+}
+```
+The variables `pctUrban` and `pctVacant6upp` don't have correlations which are significantly different than $0$. We also observe `pctKids2Par` and `pctKidsBornNevrMarr` having strong correlation with the respective target.
+
+
+Having tested on both targets, we can say that the variables `pctKids2Par` and `pctKidsBornNevrMarr` correlate strongly with the targets.
+
+## Can the relationship be characterized as a linear?
+
+We will plot the variables `pctKids2Par`, `pctKidsBornNevrMarr`, `nonViolPerPop` and `violentPerPop` visualizing them in scatterplots:
+
+```{r}
+pairs(df[,c(12,11,23,24)])
+```
+
+The scatterplots indicate that the `pctKidsBornNevrMarr` and `pctKids2Par` variables may have a linear relationship with each other, although it is not clear whether these variables have linear relationships with the targets.
+
+To see whether we can classify the relationship between these variables as linear, we can fit a linear and nonlinear model and asses whether the nonlinear model explains a significantly larger amount of variance via ANOVA.
+
+We will now test whether the variable `pctKidsBornNevrMarr` performs better with a linear or nonlinear model when modeling for `violentPerPop`:
+
+```{r}
+linModel=lm(df$violentPerPop~df$pctKidsBornNevrMarr)
+sqModel=lm(df$violentPerPop~poly(df$pctKidsBornNevrMarr,2))
+
+anova(linModel,sqModel)
+```
+
+We can see that the p-value$=2.223e-06 \lt 0.001$. So having a non-linear model fitted for the variables `violentPerPop` and `pctKidsBornNevrMarr` did lead to a significantly improved fit over the linear model. 
+
+We now fit the same models for the variables `pctKidsBornNevrMarr` and `nonViolPerPop`:
+
+```{r}
+linModel=lm(df$nonViolPerPop~df$pctKidsBornNevrMarr)
+sqModel=lm(df$nonViolPerPop~poly(df$pctKidsBornNevrMarr,2))
+
+anova(linModel,sqModel)
+```
+We again see that the non-linear model leads to a significantly improved fit over the linear model.
+
+We now test for the variables `pctKids2Par` and `nonViolPerPop`:
+
+```{r}
+linModel=lm(df$nonViolPerPop~df$pctKids2Par)
+sqModel=lm(df$nonViolPerPop~poly(df$pctKids2Par,2))
+
+anova(linModel,sqModel)
+```
+The result shows a non-significant result, $p=0.6419$. Thus, we fail to accept that the non-linear model provides a better fit and hence the relationship is linear.
+
+And lastly we test the variables `pctKids2Par` and `violentPerPop`:
+
+```{r}
+linModel=lm(df$violentPerPop~df$pctKids2Par)
+sqModel=lm(df$violentPerPop~poly(df$pctKids2Par,2))
+
+anova(linModel,sqModel)
+```
+The non-linear model provides a significant improvement in fit.
+
+We can conclude that the only relationship which is close to linear is the relationship between the variables `pctKids2Par` and `nonViolPerPop`. 
+
+## Does the relationship appear to be homoscedastic?
+
+To test whether the  relationships are homescedastic, we are going to perform the Breusch-Pagan test with the `bptest()` function.
+
+We will test for the variables `pctKidsBornNevrMarr` and `violentPerPop`:
+
+
+
+```{r}
+install.packages("lmtest")
+library(lmtest)
+model=lm(violentPerPop~pctKidsBornNevrMarr,data=df)
+bptest(model)
+```
+The p-value is 2.2e-16, hence less than 0.05. This means we have sufficient evidence that there is heteroscedasticity present in the model.
+
+Testing for the variables `pctKidsBornNevrMarr` and `nonViolPerPop`:
+
+
+```{r}
+model=lm(nonViolPerPop~pctKidsBornNevrMarr,data=df)
+bptest(model)
+```
+We have sufficient evidence that there is heteroscedasticity present in the model.
+
+We test for `pctKids2Par` and `violentPerPop`:
+
+```{r}
+model=lm(violentPerPop~pctKids2Par,data=df)
+bptest(model)
+```
+We have sufficient evidence that there is heteroscedasticity present in the model.
+
+We test for `pctKids2Par` and `nonViolPerPop`:
+
+```{r}
+model=lm(nonViolPerPop~pctKids2Par,data=df)
+bptest(model)
+```
+We have sufficient evidence that there is heteroscedasticity present in the model.
+
+
+In all of the relationships that we have examined for presence of homoscedasticity, we have found homoscedasticity present in every relationship. 
+
+
+# What transformations, if any, might be applied, to resolve any issues? 
+
+If heteroscedasticity is the issue we can apply a log transformation on the targets.
+
+
+# Are there any other approaches that could be taken to tackle these issues?
+
