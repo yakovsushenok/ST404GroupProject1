@@ -198,7 +198,7 @@ TEST CHANGE11
 
 
 
-## Correlation between explanatory variables
+# Correlation between explanatory variables
 
 To investigate the correlation between all explanatory variables, we first plot a correlation matrix with all explanatory variables included (In Appendix).
 
@@ -269,7 +269,7 @@ In the end, we recommend using these remaining variables for model building purp
 
 
 
-## Appendix
+# Appendix
 
 ```{r echo=FALSE}
 USACrimeCorrelation <- subset(USACrime, select=-c(State,region,violentPerPop,nonViolPerPop))
