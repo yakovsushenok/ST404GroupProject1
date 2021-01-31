@@ -191,3 +191,89 @@ If heteroscedasticity is the issue we can apply a log transformation on the targ
 
 
 TEST CHANGE11
+
+
+
+
+
+
+
+## Correlation between explanatory variables
+
+To investigate the correlation between all explanatory variables, we first plot a correlation matrix with all explanatory variables included (In Appendix).
+
+However, a correlation matrix with 20 variables is difficult to look at. We can remove variables that have low correlation with all other variables, that are variables that have absolute value of correlation coefficient of less than or equal to 0.65 with all other variables, to remove some variables out of the discussion. 
+
+We are then left with the following correlation matrix:
+
+```{r figs, echo=FALSE, fig.width=5,fig.height=4,fig.cap="\\label{fig:figs}Correlation Matrix for selected explanatory variables"}
+USACrimeCorrelation <- subset(USACrime,select=-c(State,region,violentPerPop,nonViolPerPop,pctUrban,pctHousOccup,pctHousOwnerOccup,pctVacantBoarded,pctVacant6up,popDensity,pctForeignBorn))
+Correlation <- cor(USACrimeCorrelation, use="pairwise.complete.obs")
+
+pvaluematrix <- cor.mtest(USACrimeCorrelation)$p
+
+col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+corrplot(Correlation, method = "color", col = col(200),
+         type = "lower", number.cex = 0.5, 
+         addCoef.col = "black", tl.cex = 0.6,
+         tl.col = "black", tl.srt = 90, 
+         p.mat = pvaluematrix, sig.level = 0.01, insig = "blank", 
+         diag = FALSE)
+```
+
+Using this correlation matrix, we are able to identify pairs or clusters of explanatory variables that are highly correlated to each other. Then we can pick one that best represents the pair/cluster and remove the rest during model building. During this part of the investigation, we would assume that two variables are highly correlated if the absolute value for their correlation coefficient is larger than 0.65.
+
+1. The first pair of highly correlated variables is 
+  + **`medIncome`**, median household income
+  + **`pctWdiv`**, percentage of households with investment/rent income
+  
+|       Both variables measures how wealthy people are in the community. Hence, we recommend using **`medIncome`** as the only wealth measuring variable.
+\
+
+2. The second cluster of highly correlated variables is
+  + **`pctLowEdu`**, percentage of people 25 and over with less than a 9th grade education
+  + **`pctNotHSgrad`**, percentage of people 25 and over that are not high school graduates
+  + **`pctCollGrad`**,percentage of people 25 and over with a bachelors degree or higher education
+  
+|       All three variables measures the education level of the people in the community. Hence, we recommend using **`pctLowEdu`** as the only education measuring variable.
+\
+
+3. The third pair of highly correlated variables is
+  + **`pctUnemployed`**, percentage of people 16 and over, in the labor force, and unemployed
+  + **`pctEmploy`**, percentage of people 16 and over who are employed
+
+|       Both variables measures the employability of the people in the community. Hence, we recommend using **`pctUnemployed`** as the only employment measuring variable.
+\
+
+
+4. The forth pair of highly correlated variables is 
+  + **`pctKids2Par`**, percentage of kids in family housing with two parents
+  + **`pctKidsBornNevrMarr`**, percentage of kids born to never married
+  
+|       Both variables measures the completeness of family of the people in the community. Hence, we recommend using **`pctKids2Par`** as the only completeness of family measuring variable.
+\
+
+5. The last cluster of highly correlated variables is
+  + **`ownHouseMed`**, owner occupied housing - median value
+  + **`ownHousQrange`**, owner occupied housing - difference between upper quartile and lower quartile values
+  + **`rentMed`**, rental housing - median rent
+
+|       All three variables measures the cost of living(housing) for the people in the community. Hence, we recommend using **`ownHouseMed`** as the only completeness of family measuring variable.
+
+In the end, we recommend using these remaining variables for model building purposes.
+
+
+
+
+
+
+
+
+## Appendix
+
+```{r echo=FALSE}
+USACrimeCorrelation <- subset(USACrime, select=-c(State,region,violentPerPop,nonViolPerPop))
+Correlation <- cor(USACrimeCorrelation, use="pairwise.complete.obs")
+
+corrplot(Correlation, type="lower", method="number", number.cex=0.5, tl.col="black")
+```
