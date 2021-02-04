@@ -2,7 +2,12 @@
 title: "ST404-Project-1"
 author: "group17"
 date: "27/01/2021"
-output: html_document
+output:
+     pdf_document: default 
+     html_document: default
+     word_document: default
+ 
+  
 
 ---
 
@@ -197,6 +202,37 @@ Using this correlation matrix, we are able to identify pairs or clusters of expl
 |       All three variables measures the cost of living(housing) for the people in the community. Hence, we recommend using **`ownHouseMed`** as the only completeness of family measuring variable.
 
 In the end, we recommend using these remaining variables for model building purposes.
+
+
+
+
+## Missing data
+
+There are 73 missing records in the dataset, 52 missing values within variable **`medIncome`** and 21 missing values within **“pctEmploy”**. This is a cause for concern when fitting a model for the dependent variables. Data which is MAR or MNAR risks fitting a model which does not consider sufficient data from a subgroup of the dataset, whether that data is missing because of variables directly related to the data or otherwise. 
+There is no indication that a particular region or state had significantly more missing values than any other when considering either of the two variables with missing values, see Figure 1. A similar mosaic plot for “regions” is produced (s. The plot shows a small number of missing values shared roughly equally across regions. 
+
+![Mosaic plot of variables "medIncome" and pctEmploy against State showing proportion of missing values](EmilyPic1.jpg){#id .class width=50 height=30cm}
+
+
+To consider the type of missing values, boxplots for all independent USACrime variables were produced. These plots compare each dependent variable’s observations when the observations are classified as missing or non-missing with regards to its “medIncome” and “pctEmploy” record.
+
+![Boxplots for “medIncome” missing and non-missing values against 9 other variables](EmilyPic2.jpg)
+
+
+In the plot above, we compare the distribution of 9 out of 19 independent variables to “medIncome”. Apart from the box plot of “medIncome” against “pctUrban”, all boxplots show a similar distribution for each variable regardless of whether “medIncome” was recognised as missing or non-missing. For “pctUrban” the boxplot does not sufficiently show that the distributions are similar.
+
+
+However, a density plot of “pctUrban” against “medIncome”’s missing and non-missing values does confirm there is similarity between distributions, see the plot below.
+
+![Density plots of “pctUrban” for missing and non-missing “medIncome” values](EmilyPic3.jpg)
+
+
+
+
+
+
+
+
 
 
 
@@ -767,3 +803,71 @@ USACrimeCorrelation <- subset(USACrime, select=-c(State,region,violentPerPop,non
 Correlation <- cor(USACrimeCorrelation, use="pairwise.complete.obs")
 corrplot(Correlation, type="lower", method="number", number.cex=0.5, tl.col="black")
 ```
+
+
+# 5
+
+There are 73 missing records in the dataset, 52 missing values within variable ““medIncome”” and 21 missing values within “pctEmploy”. This is a cause for concern when fitting a model for the dependent variables. Data which is MAR or MNAR risks fitting a model which does not consider sufficient data from a subgroup of the dataset, whether that data is missing because of variables directly related to the data or otherwise. 
+There is no indication that a particular region or state had significantly more missing values than any other when considering either of the two variables with missing values, see Figure 1. A similar mosaic plot for “regions” is produced. The plot shows a small number of missing values shared roughly equally across regions. 
+
+```{r eval=FALSE}
+attach(USACrime)
+#Creation of 2 new variables showing if each observation is missing records for medIncome and pctEmploy
+USACrime$medIncomeNA <- ifelse(is.na(medIncome), "Missing", "Not missing")
+USACrime$pctEmployNA <- ifelse(is.na(pctEmploy), "Missing", "Not missing")
+attach(USACrime)
+#Mosaic plots showing the proportion of missing values for medIncome and pctEmploy for State variable
+par0<- par(mfrow=c(2,1), mar =c(2,2,2,2))
+par0<- par(mfrow=c(2,1), mar =c(2,2,2,2))
+mosaicplot(table(State, medIncomeNA), cex.axis = .55, col = c("red", "light blue"), main = "Missing medIncome values", las=3)
+mosaicplot(table(State, pctEmployNA), cex.axis = .55, col = c("red", "light blue"), main = "Missing pctEmploy values", las = 3)
+par(par0)
+```
+
+Computing the box plots for all variables against “medIncome” and “pctUrban” shows that all variables are very similarly distributed (looking particularly at the median and inter-quartile range of each), regardless of whether each row respectively is missing values or not. Thus, it can be concluded that a random sample of data is missing and we can consider this missing data as MCAR.
+
+```{r eval=FALSE}
+#Boxplots comparing the distribution of 19 variables to missing and non-missing medIncome values
+par1<- par(mfrow=c(3,3), mar =c(3,3,3,3))
+boxplot(pctUrban~medIncomeNA, col=c("red", "light blue"), xlab = "", ylab="")
+mtext(text = "medIncome", side =1, line =2, cex=.7)
+mtext(text = "pctUrban", side =2, line =2, cex =  .7)
+boxplot(pctWdiv ~ medIncomeNA, col=c("red", "light blue"), xlab = "", ylab="")
+mtext(text = "medIncome", side =1, line =2, cex=0.7)
+mtext(text = "pctWdiv", side =2, line =2, cex =  0.7)
+boxplot(pctLowEdu ~ medIncomeNA, col=c("red", "light blue"), xlab = "", ylab="")
+mtext(text = "medIncome", side =1, line =2, cex=0.7)
+mtext(text = "pctLowEdu", side =2, line =2, cex =  0.7)
+boxplot(pctNotHSgrad ~ medIncomeNA, col=c("red", "light blue"), xlab = "", ylab="")
+mtext(text = "medIncome", side =1, line =2, cex=0.7)
+mtext(text = "pctNotHSgrad", side =2, line =2, cex =  0.7)
+boxplot(pctCollGrad ~ medIncomeNA, col=c("red", "light blue"), xlab = "", ylab="")
+mtext(text = "medIncome", side =1, line =2, cex=0.7)
+mtext(text = "pctCollGrad", side =2, line =2, cex =  0.7)
+boxplot(pctUnemploy ~ medIncomeNA, col=c("red", "light blue"), xlab = "", ylab="")
+mtext(text = "medIncome", side =1, line =2, cex=0.7)
+mtext(text = "pctUnemploy", side =2, line =2, cex =  0.7)
+boxplot(pctEmploy ~ medIncomeNA, col=c("red", "light blue"))
+mtext(text = "medIncome", side =1, line =2, cex=0.7)
+mtext(text = "pctEmploy", side =2, line =2, cex =  0.7)
+boxplot(pctKids2Par ~ medIncomeNA, col=c("red", "light blue"))
+mtext(text = "medIncome", side =1, line =2, cex=0.7)
+mtext(text = "pctKids2Par", side =2, line =2, cex =  0.7)
+boxplot(pctKidsBornNevrMarr ~ medIncomeNA, col=c("red", "light blue"))
+mtext(text = "medIncome", side =1, line =2, cex=0.7)
+mtext(text = "pctKidsBornNevrMarr", side =2, line =2, cex =  0.7)
+par(par1)
+```
+
+
+
+
+```{r eval=FALSE}
+#Density plot of pctUrban for missing and non-missing values of medIncome
+library(tidyverse)
+DensityPlot <- ggplot(data=USACrime, aes(pctUrban, colour = medIncomeNA)) + 
+  geom_density(size = 1.1) + ggtitle("The distributon of pctUrban for missing and non-missing values of medIncome") +
+  theme_bw()
+show(DensityPlot)
+```
+
