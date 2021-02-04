@@ -23,6 +23,38 @@ library(corrplot)
 
 
 
+# Executive summary
+
+
+
+
+
+# Key findings
+
+1. The highly correlated pairs of variables are:
+  + **`medIncome`** and **`pctWdiv`**, with correlation coefficient of 0.75
+  + **`pctUnemployed`** and **`pctEmploy`**, with correlation coefficient of 0.67
+  + **`pctKids2Par`** and **`pctKidsBornNevrMarr`**, with correlation coefficient of 0.86
+  
+2. The highly correlated cluster of variables are:
+  + **`pctLowEdu`**, **`pctNotHSgrad`** and **`pctCollGrad`**, with average correlation coefficient of 0.75
+  + **`ownHouseMed`**, **`ownHousQrange`** and **`rentMed`**. with average correlation coefficeint of 0.79
+  
+  
+  
+  
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+# Statistical Methodology 
+
 ```{r include=FALSE}
 load("USACrime.Rda")
 df=USACrime
