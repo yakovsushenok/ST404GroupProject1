@@ -88,7 +88,14 @@ From the scatter plots it is evident that the relationships are not linear. Howe
 
 From the scatterplots above we see that the relationships are heteroscedastic. We test our hypothesis with the Breusch-Pagan test and indeed the relationships are hetersocedastic (see appendix 1.3).
 
-We applied log transformations to the independent variables, but it did not resolve the issue where the relationship is heteroscedastic.Although our attempts didn't solve the issues, ther are other approaches include performing the Box-Cox transformation as well fitting a model that accounts for changes in variance.
+
+## What transformations, if any, might be applied, to resolve any issues?
+
+We applied log tranformations to the dependent variables and this resolved the issue of heteroscedasticity with most of the variables (see appendix 1.4). Before modelling, we recommend log transforming the dependent variables.
+
+## Are there any other approaches that could be taken to tackle these issues?
+
+Other approach include performing the Box-Cox transformation as well fitting a model that accounts for changes in variance.
   
   
   
@@ -612,7 +619,9 @@ We have sufficient evidence that there is heteroscedasticity present in the mode
 
 In all of the relationships that we have examined for presence of homoscedasticity, we have found heteroscedasticity present in every relationship. 
 
-# What transformations, if any, might be applied, to resolve any issues? 
+# 1.4
+
+### What transformations, if any, might be applied, to resolve any issues? 
 
 We applied log transformations to the independent variables, but it did not resolve the issue where the relationship is heteroscedastic.
 
@@ -621,9 +630,6 @@ We will log transform `violentPerPop` and test for homoscedasticity with `pctKid
 ```{r}
 model=lm(log(violentPerPop)~pctKidsBornNevrMarr,data=df)
 bptest(model)
-```
-```{r}
-df%>%ggplot(aes(x=pctKidsBornNevrMarr,y=violentPerPop))+geom_point()+geom_smooth()
 ```
 
 We log transformed `violentPerPop` and it resolved the issue with heteroscedasticity.
